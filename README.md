@@ -1,9 +1,7 @@
 # CODEX
----
 It's a literate programming preprocessor that parses markdown to extract the code blocks.
 It should have been a bash script ngl.
 # Usage
----
 Git clone this repo. There you will find a code binary file.
 ```bash
 ./codex <input> <output>
