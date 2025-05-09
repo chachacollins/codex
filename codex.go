@@ -7,8 +7,18 @@ import (
 	"strings"
 )
 
-func ExtractCodeBlocks(md string) []string {
-	re := regexp.MustCompile("```(?s)(.*?)```")
+func error(a ...any) {
+	fmt.Fprintf(os.Stderr, "[Error]: %s\n", a)
+	os.Exit(1)
+}
+func usage() {
+	fmt.Println("[Usage]: codex <input> <output>")
+}
+func extractCodeBlocks(md string) []string {
+	backtick := "`"
+	tripleBacktick := backtick + backtick + backtick
+	pattern := tripleBacktick + "(?s)(.*?)" + tripleBacktick
+	re := regexp.MustCompile(pattern)
 	matches := re.FindAllStringSubmatch(md, -1)
 	var results []string
 	for _, match := range matches {
@@ -22,11 +32,6 @@ func ExtractCodeBlocks(md string) []string {
 	}
 	return results
 }
-
-func usage() {
-	fmt.Println("[Usage]: codex <input> <output>")
-}
-
 func main() {
 	args := os.Args
 	if len(args) < 3 {
@@ -38,14 +43,12 @@ func main() {
 	output := args[2]
 	inputFile, err := os.ReadFile(input)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error]: %s", err)
-		os.Exit(1)
+		error(err)
 	}
-	codeBlock := ExtractCodeBlocks(string(inputFile))
+	codeBlock := extractCodeBlocks(string(inputFile))
 	outputFile, err := os.OpenFile(output, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[Error]: %s", err)
-		os.Exit(1)
+		error(err)
 	}
 	defer outputFile.Close()
 	for _, code := range codeBlock {
